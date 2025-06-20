@@ -11,8 +11,12 @@ export const metadata: Metadata = {
   description: 'Discover and search for your favorite manga with Kansou, the ultimate manga search engine powered by AniList.',
   keywords: 'manga, search, anime, comics, japanese, reading',
   authors: [{ name: 'Kansou Team' }],
-  viewport: 'width=device-width, initial-scale=1',
 }
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
 export default function RootLayout({
   children,

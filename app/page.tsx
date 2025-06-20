@@ -59,17 +59,60 @@ export default function Home() {
   const searchManga = async () => {
     setLoading(true)
     try {
-      const params = new URLSearchParams()
-      if (searchQuery.trim()) params.append('q', searchQuery.trim())
-      if (selectedGenres.length > 0) params.append('genres', selectedGenres.join(','))
-      if (selectedFormats.length > 0) params.append('formats', selectedFormats.join(','))
-      if (selectedStatuses.length > 0) params.append('status', selectedStatuses.join(','))
+      const query = `
+        query ($search: String, $genres: [String], $formats: [MediaFormat], $status: [MediaStatus]) {
+          Page(page: 1, perPage: 24) {
+            media(
+              type: MANGA
+              search: $search
+              genre_in: $genres
+              format_in: $formats
+              status_in: $status
+              sort: [POPULARITY_DESC, SCORE_DESC]
+            ) {
+              id
+              siteUrl
+              title {
+                english
+                romaji
+                native
+              }
+              coverImage {
+                large
+                medium
+              }
+              description(asHtml: true)
+              averageScore
+              popularity
+              genres
+              format
+              status
+              startDate {
+                year
+                month
+                day
+              }
+            }
+          }
+        }
+      `
 
-      // Always fetch, even if params is empty (to get default recommendations)
-      const response = await fetch(`/api/search?${params.toString()}`)
+      const variables = {
+        search: searchQuery.trim() || undefined,
+        genres: selectedGenres.length > 0 ? selectedGenres : undefined,
+        formats: selectedFormats.length > 0 ? selectedFormats : undefined,
+        status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
+      }
+
+      const response = await fetch('https://graphql.anilist.co', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ query, variables }),
+      })
+
       if (response.ok) {
         const data = await response.json()
-        setMangas(data)
+        setMangas(data.data.Page.media)
       } else {
         setMangas([])
       }

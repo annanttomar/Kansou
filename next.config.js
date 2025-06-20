@@ -1,8 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
-}
+  output: 'export',
+  // If your repo is not at the root domain, set the basePath and assetPrefix:
+  basePath: '/Kansou',
+  assetPrefix: '/Kansou/',
+  // If you use images, add images.unoptimized:
+  images: { unoptimized: true },
+};
 
-module.exports = nextConfig 
+module.exports = nextConfig;
